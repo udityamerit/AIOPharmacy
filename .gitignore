@@ -29,3 +29,5 @@ Thumbs.db
 # Data & Model Files
 *.pkl
 *.npz
+
+.__pycache__
