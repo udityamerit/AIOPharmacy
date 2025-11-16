@@ -28,8 +28,6 @@
 - [API Documentation](#-api-documentation)
 - [Project Structure](#-project-structure)
 - [Machine Learning Model](#-machine-learning-model)
-- [Screenshots](#-screenshots)
-- [Roadmap](#-roadmap)
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Contact](#-contact)
