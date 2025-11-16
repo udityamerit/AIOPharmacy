@@ -93,11 +93,11 @@ try:
             except (ValueError, TypeError, KeyError):
                 pass
     
-    print(f"✅ Successfully loaded {len(pharmacy_data)} pharmacies from '{CSV_FILENAME}'.")
-    if len(pharmacy_data) > 0:
-        print(f"--- Example pharmacy row (to check column names): ---")
-        print(pharmacy_data[0])
-        print("-----------------------------------------------------")
+    # print(f"✅ Successfully loaded {len(pharmacy_data)} pharmacies from '{CSV_FILENAME}'.")
+    # if len(pharmacy_data) > 0:
+    #     print(f"--- Example pharmacy row (to check column names): ---")
+    #     print(pharmacy_data[0])
+    #     print("-----------------------------------------------------")
 
 except FileNotFoundError:
     print(f"FATAL ERROR: '{CSV_FILENAME}' not found. Make sure it's in the root folder.")

@@ -48,9 +48,8 @@
         
         /* --- Map Styles --- */
         #map {
-            height: 100%;
-            min-height: 400px; /* For mobile */
-            width: 100%;
+            height: 600px; /* MODIFIED: Increased height for broader view */
+            width: 135%;
             border-radius: 0.75rem; /* rounded-xl */
             border: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 10; /* Ensure map is clickable */
@@ -58,6 +57,28 @@
         .leaflet-container {
             background-color: #0d1a2e; /* Dark background for map tiles */
         }
+        
+        /* --- NEW: Styles for Dark Theme Map Controls --- */
+        .leaflet-control-layers {
+            background: #1e293b !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 6px;
+        }
+        .leaflet-control-layers-base label,
+        .leaflet-control-layers-base span {
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+        .leaflet-control-layers-toggle {
+            background-color: #1e293b !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .leaflet-control-layers-toggle:hover {
+            background-color: #334155 !important;
+        }
+        /* --- END NEW STYLES --- */
+
         /* Custom map popup styles */
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
             background-color: #1e293b; /* bg-slate-800 */
@@ -71,6 +92,26 @@
         .leaflet-popup-close-button {
             color: #e2e8f0 !important;
         }
+
+        /* --- NEW: Style for Range Slider --- */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -6px; /* Center thumb */
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        /* --- END NEW STYLES --- */
     </style>
 {% endblock %}
 
@@ -80,14 +121,22 @@
         
         <div class="text-center mb-8">
             <h2 class="text-3xl font-bold text-white">Find Nearby Pharmacies</h2>
-            <p class="text-slate-400">
-                Click the button to find pharmacies within 15km of your location.
+            <p id="searchDescription" class="text-slate-400">
+                Use the slider to set a radius and find pharmacies near you.
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
             
-            <div class="space-y-6">
+            <div class="space-y-6 md:col-span-2">
+
+                <div class="widget-box p-5 rounded-lg">
+                    <label for="radiusSlider" class="block mb-2 text-sm font-medium text-white">Search Radius</label>
+                    <div class="flex items-center space-x-4">
+                        <input id="radiusSlider" type="range" min="1" max="50" value="15" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                        <span id="radiusValue" class="font-semibold text-lg text-blue-300 w-16 text-right">15 km</span>
+                    </div>
+                </div>
                 <button id="getLocationBtn" onclick="getUserLocation()" class="w-full py-3 px-4 rounded-lg font-semibold text-white btn-primary">
                     Find Pharmacies Near Me
                 </button>
@@ -98,7 +147,7 @@
                     </div>
             </div>
             
-            <div class="w-full h-full">
+            <div class="w-full h-full md:col-span-3">
                 <div id="map"></div>
             </div>
 
@@ -122,19 +171,43 @@
         const statusEl = document.getElementById('status');
         const resultsList = document.getElementById('results-list');
         
+        // NEW: Get slider elements
+        const radiusSlider = document.getElementById('radiusSlider');
+        const radiusValue = document.getElementById('radiusValue');
+        const searchDescription = document.getElementById('searchDescription');
+        
         let map;
         let userMarkerLayer;
         let pharmacyMarkerLayer;
+        
+        // NEW: Define multiple tile layers for light/dark mode
+        const tileLayers = {
+            dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }),
+            light: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            })
+        };
 
         function initMap() {
             if (document.getElementById('map') && !map) {
                 map = L.map('map').setView([20.59, 78.96], 5); // [lat, lon], zoom
 
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                    subdomains: 'abcd',
-                    maxZoom: 20
-                }).addTo(map);
+                // MODIFIED: Add default layer (dark)
+                tileLayers.dark.addTo(map);
+                
+                // NEW: Add layer control for light/dark mode
+                const baseMaps = {
+                    "Dark Mode": tileLayers.dark,
+                    "Light Mode": tileLayers.light
+                };
+                L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
+                // END NEW
                 
                 userMarkerLayer = L.layerGroup().addTo(map);
                 pharmacyMarkerLayer = L.layerGroup().addTo(map);
@@ -194,13 +267,18 @@
             if (resultsList) resultsList.innerHTML = "";
             if (pharmacyMarkerLayer) pharmacyMarkerLayer.clearLayers();
 
+            // NEW: Get radius from slider
+            const radius = radiusSlider.value;
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    // MODIFIED: Send radius to the backend
                     body: JSON.stringify({
                         user_lat: userLocation.lat,
-                        user_lon: userLocation.lon
+                        user_lon: userLocation.lon,
+                        radius_km: parseInt(radius, 10)
                     })
                 });
 
@@ -219,8 +297,12 @@
         }
 
         function displayResults(pharmacies) {
+            // NEW: Get radius from slider for status message
+            const radius = radiusSlider.value;
+            
             if (pharmacies.length === 0) {
-                showStatus(`No pharmacies found within 15km.`, "loading");
+                // MODIFIED: Use dynamic radius in message
+                showStatus(`No pharmacies found within ${radius}km.`, "loading");
                 return;
             }
             
@@ -260,7 +342,8 @@
             if (type === 'loading') {
                 statusEl.classList.add('bg-blue-900/50', 'text-blue-200');
             } else if (type === 'success') {
-                statusEl.classList.add('bg-green-900/5Ea0', 'text-green-200');
+                // FIXED a typo here: 5Ea0 -> 50
+                statusEl.classList.add('bg-green-900/50', 'text-green-200');
             } else if (type === 'error') {
                 statusEl.classList.add('bg-red-900/50', 'text-red-200');
             }
@@ -268,6 +351,22 @@
 
         document.addEventListener('DOMContentLoaded', (event) => {
             initMap();
+
+            // NEW: Add event listener for the slider
+            if (radiusSlider) {
+                radiusSlider.addEventListener('input', (e) => {
+                    const radius = e.target.value;
+                    if (radiusValue) {
+                        radiusValue.textContent = `${radius} km`;
+                    }
+                    if (searchDescription) {
+                        searchDescription.textContent = `Find pharmacies within ${radius}km of your location.`;
+                    }
+                });
+                
+                // Trigger input event to set initial text
+                radiusSlider.dispatchEvent(new Event('input'));
+            }
         });
 
     </script>
