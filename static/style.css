@@ -573,7 +573,7 @@ button:hover { background-color: var(--accent-color); color: var(--primary-bg); 
 
 /* Reduces font size for the logo */
 .main-header .nav-logo {
-    font-size: 16px; /* Adjust this value as needed */
+    font-size: 20px; /* Adjust this value as needed */
 }
 
 /* Reduces font size for the "Hello, User" text */
@@ -585,4 +585,180 @@ button:hover { background-color: var(--accent-color); color: var(--primary-bg); 
 .main-header .user-actions .login-button,
 .main-header .user-actions .logout-button {
     font-size: 14px; /* Adjust this value as needed */
+}
+
+/* ==   PROFESSIONAL NAV BAR BUTTONS       == */
+
+.user-actions {
+    display: flex;
+    align-items: center;
+}
+
+/* This styles the "Hello, user" text */
+.user-actions .nav-user {
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 15px;
+    color: #ffffff; /* Ensure it's white */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5); /* Add subtle shadow for contrast */
+}
+
+/* This is the main fix. 
+  It styles *both* the login and logout buttons to be identical.
+*/
+.user-actions .login-button,
+.user-actions .logout-button {
+    display: inline-block;
+    background-color: #00aaff;    /* Theme blue color */
+    color: #FFFFFF !important;    /* Force white text */
+    text-decoration: none;
+    padding: 10px 18px;           /* Makes the button "bigger" */
+    border: none;
+    border-radius: 5px;           /* Professional rounded corners */
+    font-size: 10px;              /* "Bigger font" */
+    font-weight: 600;             /* Bolder text */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Adds a professional hover effect */
+.user-actions .login-button:hover,
+.user-actions .logout-button:hover {
+    background-color: #33bbff;    /* Lighter blue on hover */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transform: translateY(-2px);  /* Lifts the button slightly */
+}
+
+/* ========================================= */
+/* ==   PROFESSIONAL NAVIGATION BAR V2     == */
+/* ========================================= */
+
+/* --- 1. Main Header Bar Styling --- */
+
+.main-header {
+    width: 100%;
+    padding: 10px 5%; /* Use percentage for responsive padding */
+    background: rgba(10, 25, 47, 0.8); /* Dark blue, semi-transparent background */
+    backdrop-filter: blur(10px);        /* Frosted glass effect */
+    border-bottom: 1px solid rgba(135, 206, 250, 0.2); /* Subtle light blue border */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+    position: fixed; /* Sticks to the top */
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Stays on top of all other content */
+    -webkit-backdrop-filter: blur(10px); /* Safari support */
+}
+
+/* --- 2. Main Nav Container (Flexbox Layout) --- */
+
+.main-header nav {
+    display: flex;
+    justify-content: space-between; /* This is key: Logo (Left), Links (Center), Actions (Right) */
+    align-items: center;
+    width: 100%;
+    max-width: 1400px; /* Constrain width on very large screens */
+    margin: 0 auto;
+}
+
+/* --- 3. Logo Styling --- */
+
+.nav-logo {
+    font-size: 26px;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-decoration: none;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    transition: color 0.3s ease;
+}
+
+.nav-logo:hover {
+    color: #40c4ff; /* Light blue on hover */
+}
+
+/* --- 4. Main Navigation Links (Center) --- */
+
+.nav-links {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Space between each link */
+    flex-grow: 1; /* Allows this section to grow and push others */
+}
+
+.nav-links a {
+    font-size: 17px;
+    font-weight: 500;
+    color: #cbd5e1; /* Light gray-blue, not pure white */
+    text-decoration: none;
+    padding: 8px 0; /* Vertical padding for a larger click area */
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+/* Underline effect for hover/active */
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #00aaff;
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: #FFFFFF; /* Bright white when active or hovered */
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+    width: 100%; /* Show underline */
+}
+
+/* --- 5. User Actions (Login/Logout Buttons) --- */
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between "Hello" and the button */
+}
+
+.user-actions .nav-user {
+    font-size: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    white-space: nowrap; /* Prevents name from wrapping */
+}
+
+.user-actions .login-button,
+.user-actions .logout-button {
+    display: inline-block;
+    background-color: #00aaff;
+    color: #FFFFFF !important;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.user-actions .login-button:hover,
+.user-actions .logout-button:hover {
+    background-color: #33bbff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+}
+
+/* --- 6. Fix for Page Content --- */
+/* This pushes your main content down so it doesn't hide under the new fixed header */
+
+.page-wrapper {
+    padding-top: 100px; /* Adjust this value based on your header's final height */
 }
