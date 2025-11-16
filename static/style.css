@@ -762,3 +762,91 @@ button:hover { background-color: var(--accent-color); color: var(--primary-bg); 
 .page-wrapper {
     padding-top: 100px; /* Adjust this value based on your header's final height */
 }
+
+
+/* ========================================= */
+/* ==   PERFECT RESPONSIVE NAVBAR V3       == */
+/* ========================================= */
+
+/* --- 1. Mobile Toggle Button (Hidden by Default) --- */
+.mobile-toggle {
+    display: none; /* Hide hamburger icon on desktop */
+    font-size: 24px;
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: 5px;
+}
+
+/* --- 2. Main Responsive Breakpoint (Tablets & Phones) --- */
+/* On screens 1024px or less, the magic happens */
+
+@media screen and (max-width: 1024px) {
+
+    /* --- 3. Hide Desktop Links & Show Mobile Icon --- */
+    .nav-links {
+        display: none; /* Hide the center links */
+    }
+    .user-actions {
+        display: none; /* Hide the login/logout buttons */
+    }
+    .mobile-toggle {
+        display: block; /* Show the hamburger icon */
+    }
+
+    /* --- 4. Hide Animated Doctor on Mobile (Too Big) --- */
+    #animated-character {
+        display: none;
+    }
+
+    /* --- 5. Style the "Responsive" (Clicked) State --- */
+    
+    /* When .responsive is added, the nav expands */
+    .main-header nav.responsive {
+        flex-wrap: wrap; /* Allow items to wrap to the next line */
+        position: relative;
+    }
+
+    /* Make the mobile menu background dark and full-width */
+    .main-header nav.responsive .nav-links,
+    .main-header nav.responsive .user-actions {
+        display: flex;
+        flex-direction: column; /* Stack links vertically */
+        width: 100%;
+        text-align: left;
+        
+        /* This creates the dropdown menu */
+        background: rgba(10, 25, 47, 0.95); /* Even darker background for menu */
+        padding: 10px 0;
+        
+        /* Position it right under the logo/icon */
+        order: 3; /* This makes it appear *after* the logo and icon */
+        margin-top: 10px; /* Space from the top bar */
+        border-top: 1px solid rgba(135, 206, 250, 0.2);
+    }
+    
+    /* Make the stacked links look good */
+    .main-header nav.responsive .nav-links a {
+        padding: 15px 5%; /* Full width, with padding */
+        width: 100%;
+    }
+    .main-header nav.responsive .nav-links a::after {
+        /* Remove the little underline effect on mobile */
+        display: none;
+    }
+
+    /* Make the stacked buttons look good */
+    .main-R-header nav.responsive .user-actions {
+        padding: 15px 5%;
+        gap: 15px; /* Space between "Hello" and the button */
+    }
+    
+    .main-header nav.responsive .user-actions .nav-user {
+        margin: 0 0 10px 0; /* Space "Hello" above the button */
+    }
+
+    .main-header nav.responsive .user-actions .login-button,
+    .main-header nav.responsive .user-actions .logout-button {
+        width: 100%; /* Make buttons full-width */
+        text-align: center;
+    }
+}
