@@ -30,4 +30,4 @@ Thumbs.db
 *.pkl
 *.npz
 
-.__pycache__
+__pycache__

@@ -563,3 +563,26 @@ button:hover { background-color: var(--accent-color); color: var(--primary-bg); 
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* --- Navbar Font Size Adjustment --- */
+
+/* Reduces font size for the main links: Home, Recommender, etc. */
+.main-header .nav-links a {
+    font-size: 18px; /* Adjust this value as needed */
+}
+
+/* Reduces font size for the logo */
+.main-header .nav-logo {
+    font-size: 20px; /* Adjust this value as needed */
+}
+
+/* Reduces font size for the "Hello, User" text */
+.main-header .user-actions .nav-user {
+    font-size: 16px; /* Adjust this value as needed */
+}
+
+/* Reduces font size for the Login/Logout buttons */
+.main-header .user-actions .login-button,
+.main-header .user-actions .logout-button {
+    font-size: 14px; /* Adjust this value as needed */
+}

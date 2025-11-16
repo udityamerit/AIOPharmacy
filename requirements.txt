@@ -5,3 +5,4 @@ plotly
 scikit-learn
 numpy
 scipy
+flask_cors
