@@ -4,65 +4,79 @@ particlesJS.load('particles-js', 'static/particles.json', function() {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Find the search form and mic button
+    
+    // --- THE MAIN FIX ---
+    // First, find the elements
     const searchForm = document.querySelector('#search-form');
     const micBtn = document.querySelector('#mic-btn');
 
-    // If this script is on a page without these elements, stop to prevent errors.
+    // **IMPORTANT**: If the form or button aren't on this specific page,
+    // stop running the script to prevent errors.
     if (!searchForm || !micBtn) {
-        return;
+        console.log('Search form or mic button not found on this page.');
+        return; // Stop right here
     }
-
+    
+    // If we get here, the elements exist.
     const searchInput = searchForm.querySelector('input[name="query"]');
 
-    // Check if the browser supports Speech Recognition
     if ('webkitSpeechRecognition' in window) {
         const recognition = new webkitSpeechRecognition();
         recognition.continuous = false;
         
-        // --- CHANGE 1: FASTER RESPONSE ---
+        // --- FEATURE 1: FASTER RESPONSE ---
         // Set to true to get live, in-progress results
         recognition.interimResults = true; 
-        
         recognition.lang = 'en-US';
 
-        // --- CHANGE 2: STOP ON CLICK ---
-        // We need a function to handle stopping, so we can add/remove it
-        const stopRecognitionOnClick = () => {
-            console.log('Page clicked, stopping recognition.');
-            recognition.stop();
+        // --- FEATURE 2: STOP ON CLICK (Implementation) ---
+        // This function will be called if the page is clicked *while listening*
+        const stopRecognitionOnClick = (event) => {
+            // Check if the click was *not* on the mic button itself
+            // We check the button and any icon inside it
+            if (event.target !== micBtn && !micBtn.contains(event.target)) {
+                console.log('Page clicked, stopping recognition.');
+                recognition.stop();
+                // The 'onend' event will handle removing this listener
+            }
         };
 
         // Start recognition when the mic button is clicked
         micBtn.addEventListener('click', () => {
             try {
                 recognition.start();
-                // Add a listener to the entire document to stop recognition
-                document.addEventListener('click', stopRecognitionOnClick);
-                // You could also add a visual "listening" class to the mic button here
-                // micBtn.classList.add('is-listening');
+                // Add a "listening" class for visual feedback
+                micBtn.classList.add('is-listening');
+                // Add the "stop" listener to the body
+                document.body.addEventListener('click', stopRecognitionOnClick);
             } catch (e) {
-                console.error('Speech recognition could not be started.', e);
-                // Make sure to remove the listener if starting fails
-                document.removeEventListener('click', stopRecognitionOnClick);
+                console.error('Recognition could not start:', e);
+                // Clean up if it fails to start
+                micBtn.classList.remove('is-listening');
+                document.body.removeEventListener('click', stopRecognitionOnClick);
             }
         });
 
         // Fired when speech recognition ends (for any reason)
         recognition.onend = () => {
-            // ALWAYS remove the click listener when recognition ends
-            document.removeEventListener('click', stopRecognitionOnClick);
-            // Remove any "listening" class here
-            // e.g., micBtn.classList.remove('is-listening');
+            // ALWAYS clean up
+            micBtn.classList.remove('is-listening');
+            document.body.removeEventListener('click', stopRecognitionOnClick);
+        };
+        
+        // Fired when an error happens
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            // ALWAYS clean up
+            micBtn.classList.remove('is-listening');
+            document.body.removeEventListener('click', stopRecognitionOnClick);
         };
 
-        // --- UPDATED LOGIC FOR FASTER RESPONSE ---
-        // Fired when a result (either interim or final) is received
+        // --- Logic for interim (fast) results ---
         recognition.onresult = (event) => {
             let interimTranscript = '';
             let finalTranscript = '';
 
-            // Loop through all results
             for (let i = event.resultIndex; i < event.results.length; ++i) {
                 const transcript = event.results[i][0].transcript;
                 if (event.results[i].isFinal) {
@@ -72,22 +86,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-            // Show the interim transcript in the search bar for live feedback
+            // Update the input field in real-time
             searchInput.value = finalTranscript || interimTranscript;
 
-            // If we have a final, finalized transcript, submit the form
+            // If we get a final result, submit the form
             if (finalTranscript) {
                 searchInput.value = finalTranscript.trim();
                 searchForm.submit();
             }
-        };
-
-        // Handle recognition errors
-        recognition.onerror = (event) => {
-            console.error('Speech recognition error:', event.error);
-            // Ensure the click listener is removed on error as well
-            document.removeEventListener('click', stopRecognitionOnClick);
-            // e.g., micBtn.classList.remove('is-listening');
         };
 
     } else {
