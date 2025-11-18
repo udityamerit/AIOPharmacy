@@ -19,33 +19,35 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* --- Layout --- */
+        /* --- Layout: Forces the container to fit exactly in the viewport --- */
         .finder-page-container {
+            /* Adjust '80px' if your header is taller */
             height: calc(100vh - 80px); 
             width: 100%; 
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: hidden; /* Prevents the whole page from scrolling */
         }
 
-        /* GLOBAL: Flex column layout by default (Mobile First) */
+        /* GLOBAL: Mobile First (Stacked) */
         .finder-layout {
             display: flex;
             flex-direction: column;
             height: 100%;
             width: 100%;
+            overflow: hidden;
         }
 
-        /* DESKTOP: Switch to Grid for "Separate Columns" */
+        /* DESKTOP: Grid Layout (Side-by-Side) */
         @media (min-width: 1124px) {
             .finder-layout {
                 display: grid;
-                /* 450px for the list column, 1fr (rest of space) for the map */
+                /* Fixed 450px Sidebar, Remaining space for Map */
                 grid-template-columns: 450px 1fr; 
             }
         }
         
-        /* --- Sidebar (The List Column) --- */
+        /* --- Sidebar (Pharmacy List) --- */
         .sidebar-panel {
             background: var(--primary-bg, #0d1b2a);
             border-right: 1px solid rgba(0, 170, 255, 0.2);
@@ -53,9 +55,10 @@
             flex-direction: column;
             position: relative;
             z-index: 20;
+            overflow: hidden; /* Important for internal scrolling */
             
-            /* Mobile: List takes 60% height */
-            height: 60%;
+            /* Mobile: List takes 55% height */
+            height: 55%;
             border-bottom: 1px solid rgba(0, 170, 255, 0.2);
         }
 
@@ -65,11 +68,11 @@
             width: 100%;
             background: #050b14;
             
-            /* Mobile: Map takes 40% height */
-            height: 40%;
+            /* Mobile: Map takes 45% height */
+            height: 45%;
         }
 
-        /* Desktop Overrides: Full height for both columns */
+        /* Desktop Overrides: Full height for both */
         @media (min-width: 1124px) {
             .sidebar-panel {
                 height: 100%;
@@ -85,27 +88,29 @@
             height: 100%;
             display: flex;          
             flex-direction: column; 
-            overflow: hidden;       
+            overflow: hidden; /* STRICTLY contain children */
         }
         
         .sidebar-header-area {
             padding: 20px;
             padding-bottom: 0;
+            flex-shrink: 0; /* Don't let header shrink */
         }
 
-        /* SCROLLABLE LIST AREA */
+        /* --- SCROLLABLE LIST AREA --- */
         #results-list {
-            flex: 1;               
-            overflow-y: auto;   /* Enables vertical scrolling */   
-            min-height: 0;         
-            padding: 10px 20px 20px 20px; 
+            flex-grow: 1;          /* Take all remaining space */
+            overflow-y: auto;      /* Enable Vertical Scroll */
+            overflow-x: hidden;
+            min-height: 0;         /* Critical for Flexbox scrolling */
+            padding: 10px 20px 40px 20px; /* Extra bottom padding for scrolling space */
             scroll-behavior: smooth;
         }
 
         /* Custom Scrollbar Styling */
-        #results-list::-webkit-scrollbar { width: 6px; }
-        #results-list::-webkit-scrollbar-track { background: transparent; }
-        #results-list::-webkit-scrollbar-thumb { background: #00aaff; border-radius: 3px; }
+        #results-list::-webkit-scrollbar { width: 8px; }
+        #results-list::-webkit-scrollbar-track { background: #0d1b2a; }
+        #results-list::-webkit-scrollbar-thumb { background: #00aaff; border-radius: 4px; }
         #results-list::-webkit-scrollbar-thumb:hover { background: #0088cc; }
 
         /* --- Widgets --- */
@@ -115,7 +120,6 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            flex-shrink: 0; 
         }
 
         .slider-container input[type=range] {
@@ -219,7 +223,7 @@
         <div class="sidebar-panel">
             <div class="sidebar-content">
                 
-                <div class="shrink-0 sidebar-header-area">
+                <div class="sidebar-header-area">
                     <div class="mb-6">
                         <h2 class="text-2xl font-bold text-white flex items-center">
                             <i class="fas fa-map-marked-alt text-blue-400 mr-3"></i>Pharmacy Finder
@@ -275,7 +279,7 @@
                     </div>
                 </div>
 
-                <div id="results-list" class="pb-10 min-h-[200px]">
+                <div id="results-list">
                     <div class="text-center py-12 opacity-50">
                         <i class="fas fa-search-location text-5xl text-slate-600 mb-4"></i>
                         <p class="text-slate-400 text-sm">Enter a location or use GPS to start.</p>
@@ -494,7 +498,7 @@
             }
 
             pharmacies.forEach((p, index) => {
-                // UPDATED: Uses the standard Google Maps URL format to ensure directions work
+                // FIXED: Standard Google Maps Navigation URL
                 const googleDirectionsLink = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lon}&destination=${p.latitude},${p.longitude}&travelmode=driving`;
 
                 const card = document.createElement('div');
