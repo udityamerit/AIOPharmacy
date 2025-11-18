@@ -28,7 +28,7 @@
             overflow: hidden;
         }
 
-        /* FIXED: Global layout rules for mobile first */
+        /* GLOBAL: Flex column layout by default (Mobile First) */
         .finder-layout {
             display: flex;
             flex-direction: column;
@@ -36,16 +36,16 @@
             width: 100%;
         }
 
-        /* Desktop View: Switch to Grid */
+        /* DESKTOP: Switch to Grid for "Separate Columns" */
         @media (min-width: 1124px) {
             .finder-layout {
                 display: grid;
+                /* 450px for the list column, 1fr (rest of space) for the map */
                 grid-template-columns: 450px 1fr; 
-                /* height: 100%; inherited */
             }
         }
         
-        /* --- Sidebar --- */
+        /* --- Sidebar (The List Column) --- */
         .sidebar-panel {
             background: var(--primary-bg, #0d1b2a);
             border-right: 1px solid rgba(0, 170, 255, 0.2);
@@ -54,7 +54,7 @@
             position: relative;
             z-index: 20;
             
-            /* FIXED: Mobile height (List takes 60% of screen) */
+            /* Mobile: List takes 60% height */
             height: 60%;
             border-bottom: 1px solid rgba(0, 170, 255, 0.2);
         }
@@ -65,11 +65,11 @@
             width: 100%;
             background: #050b14;
             
-            /* FIXED: Mobile height (Map takes 40% of screen) */
+            /* Mobile: Map takes 40% height */
             height: 40%;
         }
 
-        /* Desktop Overrides for Sidebar & Map */
+        /* Desktop Overrides: Full height for both columns */
         @media (min-width: 1124px) {
             .sidebar-panel {
                 height: 100%;
@@ -80,7 +80,6 @@
             }
         }
 
-        /* FIXED: Removed padding here so scrollbar hits the edge */
         .sidebar-content {
             padding: 0; 
             height: 100%;
@@ -89,22 +88,21 @@
             overflow: hidden;       
         }
         
-        /* Header/Controls container */
         .sidebar-header-area {
             padding: 20px;
             padding-bottom: 0;
         }
 
-        /* FIXED: Results List Scroll Area */
+        /* SCROLLABLE LIST AREA */
         #results-list {
             flex: 1;               
-            overflow-y: auto;      
+            overflow-y: auto;   /* Enables vertical scrolling */   
             min-height: 0;         
             padding: 10px 20px 20px 20px; 
             scroll-behavior: smooth;
         }
 
-        /* Custom Scrollbar */
+        /* Custom Scrollbar Styling */
         #results-list::-webkit-scrollbar { width: 6px; }
         #results-list::-webkit-scrollbar-track { background: transparent; }
         #results-list::-webkit-scrollbar-thumb { background: #00aaff; border-radius: 3px; }
@@ -496,9 +494,8 @@
             }
 
             pharmacies.forEach((p, index) => {
-                // NOTE: 'userLocation' might need to be passed or accessible globally
-                // Ensure userLocation is defined before using it here.
-                const googleDirectionsLink = `http://googleusercontent.com/maps.google.com/?saddr=${userLocation.lat},${userLocation.lon}&daddr=${p.latitude},${p.longitude}&travelmode=driving`;
+                // UPDATED: Uses the standard Google Maps URL format to ensure directions work
+                const googleDirectionsLink = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lon}&destination=${p.latitude},${p.longitude}&travelmode=driving`;
 
                 const card = document.createElement('div');
                 card.className = 'pharmacy-card group';
