@@ -265,7 +265,7 @@ body {
     font-weight: 700;
     color: var(--accent-color);
     margin-bottom: 0.5rem;
-    animation: fadeInDown 1s ease-out;
+    /* Animation is now handled by AOS, old keyframe removed to avoid conflict */
     line-height: 1.2;
 }
 
@@ -273,7 +273,6 @@ body {
     font-size: 1.25rem;
     color: var(--text-primary);
     margin-bottom: 1.5rem;
-    animation: fadeInUp 1s 0.3s ease-out backwards;
 }
 
 .hero .description {
@@ -281,7 +280,13 @@ body {
     margin: 0 auto 2.5rem;
     color: var(--text-secondary);
     line-height: 1.6;
-    animation: fadeInUp 1s 0.6s ease-out backwards;
+}
+
+/* NEW: Glow Effect for CTA */
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(0, 170, 255, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(0, 170, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 170, 255, 0); }
 }
 
 .cta-button {
@@ -290,18 +295,22 @@ body {
     background-color: var(--accent-color);
     color: var(--primary-bg);
     border: 2px solid var(--accent-color);
-    border-radius: 8px;
+    border-radius: 50px; /* Rounded Pill Shape */
     font-size: 1.1em;
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
     transition: all 0.3s ease;
-    animation: fadeInUp 1s 0.9s ease-out backwards;
 }
 
 .cta-button:hover {
     background-color: transparent;
     color: var(--accent-color);
-    transform: translateY(-3px);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 170, 255, 0.4);
+}
+
+.cta-button.glow-effect {
+    animation: pulse-glow 2s infinite;
 }
 
 /* --- Homepage Features --- */
@@ -311,7 +320,7 @@ body {
     background-color: var(--container-bg);
     border: 1px solid var(--border-color);
     border-radius: 15px;
-    animation: fadeIn 1.5s ease-out;
+    /* Remove old fadeIn animation to let AOS take over */
 }
 
 .features h2 {
@@ -331,22 +340,38 @@ body {
 .feature-card {
     background-color: var(--card-bg);
     padding: 30px;
-    border-radius: 10px;
+    border-radius: 15px;
     border-bottom: 3px solid transparent;
     transition: all 0.3s ease;
     text-align: center;
+    position: relative;
+    overflow: hidden;
 }
 
+/* Fantastic Hover Effect for Cards */
 .feature-card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-15px) !important; /* Override AOS transform if needed */
     border-color: var(--accent-color);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    background-color: rgba(30, 45, 70, 0.9);
+}
+
+/* NEW: Floating Icon Animation */
+@keyframes floating {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
 }
 
 .feature-icon {
-    font-size: 3em;
+    font-size: 3.5em;
     margin-bottom: 0.5em;
     color: var(--accent-color);
+    display: inline-block;
+}
+
+.feature-icon.floating-icon {
+    animation: floating 3s ease-in-out infinite;
 }
 
 /* --- Forms --- */
@@ -543,10 +568,8 @@ button:hover {
 }
 .medicine-card-small h3 { margin-top: 0; color: var(--text-primary); font-size: 1.2rem; }
 
-/* --- Animations --- */
+/* --- Animations (Retained as backup) --- */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
 /* --- Responsive Media Queries --- */
 @media (max-width: 992px) {
