@@ -18,15 +18,13 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    
     <style>
-        
         /* --- NEW: Remove the Animated Doctor from this page only --- */
         #animated-character {
             display: none !important;
         }
+
         /* --- CRITICAL FIX: Override Global Layout for Full Screen App --- */
-        /* This ensures the container fits exactly in the viewport, removing page scroll */
         main.page-wrapper {
             margin: 0 !important;
             padding: 0 !important;
@@ -61,7 +59,7 @@
         @media (min-width: 1124px) {
             .finder-layout {
                 display: grid;
-                grid-template-columns: 550px 1fr; 
+                grid-template-columns: 450px 1fr; 
             }
         }
         
@@ -122,9 +120,7 @@
 
         /* --- RESULTS LIST (Now just content that flows naturally) --- */
         #results-list {
-            /* REMOVED: flex-grow: 1, min-height: 0, and overflow-y: auto */
             padding: 10px 20px 40px 20px; /* Extra bottom padding */
-            /* Ensure it flows normally within the scrolling parent */
         }
 
         /* Custom Scrollbar */
@@ -227,6 +223,18 @@
 
         /* --- Map Specifics --- */
         #map { height: 100%; width: 100%; z-index: 1; }
+        
+        /* Leaflet Control Styling Customization for Dark Theme */
+        .leaflet-control-layers {
+            background: #151e2a;
+            border: 1px solid #00aaff;
+            color: #fff;
+            border-radius: 8px;
+        }
+        .leaflet-control-layers-expanded {
+            padding: 10px;
+            background: rgba(21, 30, 42, 0.95);
+        }
         
         .leaflet-popup-content-wrapper {
             background: #151e2a;
@@ -353,14 +361,46 @@
             const mapEl = document.getElementById('map');
             if (!mapEl) return;
 
-            map = L.map('map', { zoomControl: false }).setView([20.59, 78.96], 5);
-            L.control.zoom({ position: 'topright' }).addTo(map);
-
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '© OpenStreetMap © CARTO',
+            // 1. Define Map Modes (Tile Layers)
+            const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© CARTO',
                 subdomains: 'abcd',
                 maxZoom: 20
-            }).addTo(map);
+            });
+
+            const lightLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© CARTO',
+                subdomains: 'abcd',
+                maxZoom: 20
+            });
+
+            const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            });
+
+            const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri',
+                maxZoom: 19
+            });
+
+            // 2. Initialize Map with "Dark Mode" as default
+            map = L.map('map', { 
+                zoomControl: false, 
+                layers: [darkLayer] 
+            }).setView([20.59, 78.96], 5);
+
+            // 3. Add Layer Control (Top Right)
+            const baseMaps = {
+                "Dark Mode": darkLayer,
+                "Light Mode": lightLayer,
+                "Streets": streetLayer,
+                "Satellite": satelliteLayer
+            };
+            L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
+
+            // 4. Add Zoom Control (Moved to Bottom Right for better UX)
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
             
             userMarkerLayer = L.layerGroup().addTo(map);
             pharmacyMarkerLayer = L.layerGroup().addTo(map);
