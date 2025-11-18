@@ -28,11 +28,20 @@
             overflow: hidden;
         }
 
+        /* FIXED: Global layout rules for mobile first */
+        .finder-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Desktop View: Switch to Grid */
         @media (min-width: 1124px) {
             .finder-layout {
                 display: grid;
                 grid-template-columns: 450px 1fr; 
-                height: 100%;
+                /* height: 100%; inherited */
             }
         }
         
@@ -42,9 +51,33 @@
             border-right: 1px solid rgba(0, 170, 255, 0.2);
             display: flex;
             flex-direction: column;
-            height: 100%;
             position: relative;
             z-index: 20;
+            
+            /* FIXED: Mobile height (List takes 60% of screen) */
+            height: 60%;
+            border-bottom: 1px solid rgba(0, 170, 255, 0.2);
+        }
+
+        /* --- Map Container --- */
+        .map-container-wrapper {
+            position: relative;
+            width: 100%;
+            background: #050b14;
+            
+            /* FIXED: Mobile height (Map takes 40% of screen) */
+            height: 40%;
+        }
+
+        /* Desktop Overrides for Sidebar & Map */
+        @media (min-width: 1124px) {
+            .sidebar-panel {
+                height: 100%;
+                border-bottom: none;
+            }
+            .map-container-wrapper {
+                height: 100%;
+            }
         }
 
         /* FIXED: Removed padding here so scrollbar hits the edge */
@@ -56,7 +89,7 @@
             overflow: hidden;       
         }
         
-        /* NEW: Header/Controls container needs padding now */
+        /* Header/Controls container */
         .sidebar-header-area {
             padding: 20px;
             padding-bottom: 0;
@@ -67,7 +100,7 @@
             flex: 1;               
             overflow-y: auto;      
             min-height: 0;         
-            padding: 10px 20px 20px 20px; /* Moved padding here */
+            padding: 10px 20px 20px 20px; 
             scroll-behavior: smooth;
         }
 
@@ -169,13 +202,7 @@
         }
         .btn-navigate:hover { background-color: #33bbff; }
 
-        /* --- Map --- */
-        .map-container-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background: #050b14;
-        }
+        /* --- Map Specifics --- */
         #map { height: 100%; width: 100%; z-index: 1; }
         
         .leaflet-popup-content-wrapper {
@@ -469,7 +496,9 @@
             }
 
             pharmacies.forEach((p, index) => {
-                const googleDirectionsLink = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lon}&destination=${p.latitude},${p.longitude}&travelmode=driving`;
+                // NOTE: 'userLocation' might need to be passed or accessible globally
+                // Ensure userLocation is defined before using it here.
+                const googleDirectionsLink = `http://googleusercontent.com/maps.google.com/?saddr=${userLocation.lat},${userLocation.lon}&daddr=${p.latitude},${p.longitude}&travelmode=driving`;
 
                 const card = document.createElement('div');
                 card.className = 'pharmacy-card group';
