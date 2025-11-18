@@ -18,18 +18,37 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     
+    
     <style>
-        /* --- Layout: Forces the container to fit exactly in the viewport --- */
+        
+        /* --- NEW: Remove the Animated Doctor from this page only --- */
+        #animated-character {
+            display: none !important;
+        }
+        /* --- CRITICAL FIX: Override Global Layout for Full Screen App --- */
+        /* This ensures the container fits exactly in the viewport, removing page scroll */
+        main.page-wrapper {
+            margin: 0 !important;
+            padding: 0 !important;
+            padding-top: 80px !important; /* Adjust to match your header height */
+            max-width: 100vw !important;
+            height: 100vh !important;
+            overflow: hidden !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Layout Container --- */
         .finder-page-container {
-            /* Adjust '80px' if your header is taller */
-            height: calc(100vh - 80px); 
+            flex: 1;               /* Fills the remaining height of the screen */
             width: 100%; 
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevents the whole page from scrolling */
+            overflow: hidden;
+            position: relative;
         }
 
-        /* GLOBAL: Mobile First (Stacked) */
+        /* --- Global Layout (Mobile First) --- */
         .finder-layout {
             display: flex;
             flex-direction: column;
@@ -38,16 +57,15 @@
             overflow: hidden;
         }
 
-        /* DESKTOP: Grid Layout (Side-by-Side) */
+        /* --- Desktop Grid Layout --- */
         @media (min-width: 1124px) {
             .finder-layout {
                 display: grid;
-                /* Fixed 450px Sidebar, Remaining space for Map */
-                grid-template-columns: 450px 1fr; 
+                grid-template-columns: 470px 1fr; 
             }
         }
         
-        /* --- Sidebar (Pharmacy List) --- */
+        /* --- Sidebar Panel (Pharmacy List Column) --- */
         .sidebar-panel {
             background: var(--primary-bg, #0d1b2a);
             border-right: 1px solid rgba(0, 170, 255, 0.2);
@@ -55,7 +73,7 @@
             flex-direction: column;
             position: relative;
             z-index: 20;
-            overflow: hidden; /* Important for internal scrolling */
+            overflow: hidden; /* Constraints the scrollable child */
             
             /* Mobile: List takes 55% height */
             height: 55%;
@@ -72,7 +90,7 @@
             height: 45%;
         }
 
-        /* Desktop Overrides: Full height for both */
+        /* Desktop: Full height for both columns */
         @media (min-width: 1124px) {
             .sidebar-panel {
                 height: 100%;
@@ -83,35 +101,38 @@
             }
         }
 
+        /* --- FIXED SCROLLING HERE --- */
         .sidebar-content {
             padding: 0; 
             height: 100%;
             display: flex;          
             flex-direction: column; 
-            overflow: hidden; /* STRICTLY contain children */
+            /* CHANGE: Enable scrolling on the entire content wrapper */
+            overflow-y: auto; 
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
         
+        /* Header Area: Now scrolls with the content */
         .sidebar-header-area {
             padding: 20px;
             padding-bottom: 0;
-            flex-shrink: 0; /* Don't let header shrink */
+            flex-shrink: 0; /* Header never shrinks */
         }
 
-        /* --- SCROLLABLE LIST AREA --- */
+        /* --- RESULTS LIST (Now just content that flows naturally) --- */
         #results-list {
-            flex-grow: 1;          /* Take all remaining space */
-            overflow-y: auto;      /* Enable Vertical Scroll */
-            overflow-x: hidden;
-            min-height: 0;         /* Critical for Flexbox scrolling */
-            padding: 10px 20px 40px 20px; /* Extra bottom padding for scrolling space */
-            scroll-behavior: smooth;
+            /* REMOVED: flex-grow: 1, min-height: 0, and overflow-y: auto */
+            padding: 10px 20px 40px 20px; /* Extra bottom padding */
+            /* Ensure it flows normally within the scrolling parent */
         }
 
-        /* Custom Scrollbar Styling */
-        #results-list::-webkit-scrollbar { width: 8px; }
-        #results-list::-webkit-scrollbar-track { background: #0d1b2a; }
-        #results-list::-webkit-scrollbar-thumb { background: #00aaff; border-radius: 4px; }
-        #results-list::-webkit-scrollbar-thumb:hover { background: #0088cc; }
+        /* Custom Scrollbar */
+        .sidebar-content::-webkit-scrollbar { width: 8px; }
+        .sidebar-content::-webkit-scrollbar-track { background: #0d1b2a; }
+        .sidebar-content::-webkit-scrollbar-thumb { background: #00aaff; border-radius: 4px; }
+        .sidebar-content::-webkit-scrollbar-thumb:hover { background: #0088cc; }
+
 
         /* --- Widgets --- */
         .control-widget {
@@ -232,7 +253,6 @@
                     </div>
 
                     <div class="control-widget">
-                        
                         <div class="mb-6">
                             <label class="block text-xs font-bold text-blue-300 uppercase mb-2 tracking-wider">
                                 Enter Custom Location
@@ -498,7 +518,7 @@
             }
 
             pharmacies.forEach((p, index) => {
-                // FIXED: Standard Google Maps Navigation URL
+                // FIXED: Google Maps Navigation Link
                 const googleDirectionsLink = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lon}&destination=${p.latitude},${p.longitude}&travelmode=driving`;
 
                 const card = document.createElement('div');
