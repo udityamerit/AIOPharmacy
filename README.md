@@ -205,36 +205,40 @@ flowchart TD
     AUTH -->|No| LOGIN[Redirect to Login]
     AUTH -->|Yes| PREPROCESS[Input Preprocessing<br/>- Lowercase<br/>- Remove special chars<br/>- Tokenization]
     
-    PREPROCESS --> VECTORIZE[TF-IDF Vectorization<br/>Convert text to numerical vector]
+    PREPROCESS --> VECTORIZE[Sentence Transformers<br/>Convert text to numerical vector]
     
     subgraph "Machine Learning Core"
-        VECTORIZE --> SIMILARITY[Cosine Similarity Calculation<br/>Compare with all medicines]
-        SIMILARITY --> RANK[Ranking Algorithm<br/>Sort by similarity score]
-        RANK --> FILTER[Filter Results<br/>Threshold: 0.1]
+        VECTORIZE --> SIMILARITY[MMR Similarity Calculation<br/>Compare with all relevant medicines]
     end
     
-    FILTER --> CHECK{Results<br/>Found?}
+    SIMILARITY --> CHECK{Results<br/>Found?}
     
     CHECK -->|No| ERROR[Display Error Message<br/>'No matches found']
-    CHECK -->|Yes| TOP[Get Top Match<br/>Best Recommendation]
     
-    TOP --> SUBS[Fetch Substitutes<br/>Brand Alternatives]
-    TOP --> OTHER[Get Other Matches<br/>Similar Medicines 2-10]
+    %% --- UPDATED SECTION START ---
+    CHECK -->|Yes| MATCHES[Get Top Matches<br/>Retrieve Top N Candidates]
+    
+    MATCHES --> PROCESS_RECS[Process Recommendations<br/>Analyze Each Match]
+    
+    MATCHES --> SUBS[Fetch Substitutes<br/>Brand Alternatives<br/>Identify Similar<br/>Medicines 2-10]
+
+    %% --- UPDATED SECTION END ---
     
     SUBS --> DISPLAY[Display Results]
-    OTHER --> DISPLAY
-    
+
+    PROCESS_RECS --> DISPLAY_IN[-Get Recommendations for each Top match<br/>- Fetch respective data<br/>- Display Recommendation inside the respective medicine ]
     DISPLAY --> UI([User Interface<br/>- Medicine Details<br/>- Substitutes<br/>- Similar Options<br/>- Age Group Info])
     
     ERROR --> UI
     LOGIN --> START
-    
+    DISPLAY_IN-->UI
     DB[(Medicine Database<br/>10,000+ Medicines<br/>- Name<br/>- Description<br/>- Reason<br/>- Age Group<br/>- Substitutes)]
     
-    VECTORIZE -.->|Load Model| MODEL[(Trained Models<br/>- TF-IDF Vectorizer<br/>- TF-IDF Matrix<br/>- Processed Data)]
+    VECTORIZE -.-> MODEL[(ChromaDB</br>Contains vectorized data of Medicine and its various attributes)]
     SIMILARITY -.->|Query| DB
-    TOP -.->|Fetch| DB
-    
+    MATCHES -.->|Fetch Data| DB
+    PROCESS_RECS -.->|Query Logic| DB
+    DB -.->|Fetch Data| DISPLAY_IN
     classDef startEnd fill:#4CAF50,stroke:#2E7D32,stroke-width:3px,color:#fff
     classDef process fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#fff
     classDef decision fill:#FF9800,stroke:#E65100,stroke-width:3px,color:#000
@@ -243,10 +247,10 @@ flowchart TD
     classDef result fill:#8BC34A,stroke:#558B2F,stroke-width:3px,color:#000
     
     class START,UI startEnd
-    class TEXT,VOICE,PREPROCESS,TOP,SUBS,OTHER,DISPLAY,ERROR,LOGIN process
+    class TEXT,VOICE,PREPROCESS,MATCHES,PROCESS_RECS,SUBS,OTHER,DISPLAY,DISPLAY_IN,ERROR,LOGIN process
     class INPUT,AUTH,CHECK decision
     class DB,MODEL database
-    class VECTORIZE,SIMILARITY,RANK,FILTER ml
+    class VECTORIZE,SIMILARITY ml
 ```
 
 ### **Component Interaction Diagram**
