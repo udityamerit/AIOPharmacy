@@ -26,7 +26,30 @@
 
     <header class="main-header">
         <nav id="main-nav">
-            <a href="{{ url_for('home') }}" class="nav-logo">AIOPharmacy</a>
+            <a href="{{ url_for('home') }}" class="nav-logo">
+                <svg class="aio-logo" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="brandGradient" x1="0" y1="0" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00aaff"/>
+                            <stop offset="100%" stop-color="#0077cc"/>
+                        </linearGradient>
+                    </defs>
+                    
+                    <g transform="translate(0, 5)">
+                        <path d="M20 0L37.32 10V30L20 40L2.68 30V10L20 0Z" fill="url(#brandGradient)"/>
+                        <path d="M20 8V32M8 20H32" stroke="#0d1b2a" stroke-width="5" stroke-linecap="round"/>
+                        <circle cx="35" cy="35" r="3" fill="#40c4ff"/>
+                    </g>
+
+                    <text x="50" y="35" font-family="'Poppins', sans-serif" font-weight="700" font-size="22" fill="#ffffff" letter-spacing="1">
+                        AIO
+                    </text>
+                    
+                    <text x="105" y="35" font-family="'Poppins', sans-serif" font-weight="300" font-size="22" fill="#a7a9be">
+                        Pharmacy
+                    </text>
+                </svg>
+            </a>
             
             <div class="nav-links">
                 <a href="{{ url_for('home') }}" class="{{ 'active' if request.endpoint == 'home' else '' }}">Home</a>
@@ -79,9 +102,9 @@
     <script>
         // Initialize AOS
         AOS.init({
-            duration: 800,  // Animation duration
-            once: true,     // Whether animation should happen only once
-            offset: 100,    // Offset (in px) from the original trigger point
+            duration: 800,  
+            once: true,     
+            offset: 100,    
             easing: 'ease-out-cubic',
         });
 

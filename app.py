@@ -12,8 +12,6 @@ import os
 # --- App and Login Configuration ---
 app = Flask(__name__)
 app.secret_key = 'your_super_secret_key_change_this'
-### NEW ###
-# Initialize CORS for our API endpoint
 CORS(app)
 
 login_manager = LoginManager()
@@ -59,14 +57,14 @@ users = load_users()
 def load_user(user_id):
     return users.get(user_id)
 
-# --- Load Model Components (from aiopharmacy) ---
-VECTORIZER_FILE = 'tfidf_vectorizer.pkl'
-MATRIX_FILE = 'tfidf_matrix.npz'
+# --- Load Model Components (Updated for ChromaDB) ---
 DATAFRAME_FILE = 'processed_data.pkl'
-vectorizer, matrix, df = load_model_components(VECTORIZER_FILE, MATRIX_FILE, DATAFRAME_FILE)
+
+# Variable unpacking updated: returns model, collection, df
+model, collection, df = load_model_components(DATAFRAME_FILE)
 
 
-# --- ### NEW ### Haversine Distance Formula (from epics-phase-2) ---
+# --- Haversine Distance Formula ---
 def haversine(lat1, lon1, lat2, lon2):
     R = 6371
     rad_lat1 = math.radians(lat1)
@@ -81,7 +79,7 @@ def haversine(lat1, lon1, lat2, lon2):
 
 pharmacy_data = []
 CSV_FILENAME = 'enriched_pharmacies_corrected.csv'
-SEARCH_RADIUS_KM = 15  # <-- Set proximity to 15km
+SEARCH_RADIUS_KM = 15 
 try:
     with open(CSV_FILENAME, mode='r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
@@ -92,13 +90,6 @@ try:
                 pharmacy_data.append(row)
             except (ValueError, TypeError, KeyError):
                 pass
-    
-    # print(f"✅ Successfully loaded {len(pharmacy_data)} pharmacies from '{CSV_FILENAME}'.")
-    # if len(pharmacy_data) > 0:
-    #     print(f"--- Example pharmacy row (to check column names): ---")
-    #     print(pharmacy_data[0])
-    #     print("-----------------------------------------------------")
-
 except FileNotFoundError:
     print(f"FATAL ERROR: '{CSV_FILENAME}' not found. Make sure it's in the root folder.")
 except Exception as e:
@@ -172,7 +163,8 @@ def recommender_page():
     if request.method == 'POST':
         user_query = request.form.get('query')
 
-        if df is None or vectorizer is None or matrix is None:
+        # Updated check for model/collection
+        if df is None or model is None or collection is None:
             flash('Sorry, the recommendation service is currently unavailable. Please contact the administrator.', 'danger')
             return render_template('index.html', error="Service unavailable.", query=user_query)
 
@@ -180,7 +172,8 @@ def recommender_page():
             flash('Please enter a medicine name or a symptom to search.', 'info')
             return render_template('index.html', recommendation=None, error=None, query=None)
 
-        recommended_medicines = get_recommendations(user_query, df, vectorizer, matrix)
+        # UPDATED CALL: Passing model and collection instead of vectorizer/matrix
+        recommended_medicines = get_recommendations(user_query, df, model, collection)
         
         if not recommended_medicines.empty:
             top_recommendation = recommended_medicines.iloc[0].to_dict()
@@ -192,7 +185,7 @@ def recommender_page():
                                    other_recommendations=other_recommendations, 
                                    query=user_query)
         
-        error_message = f"Sorry, we couldn't find any close matches for '{user_query}'. Please check your spelling or try a different term (e.g., 'fever', 'headache')."
+        error_message = f"Sorry, we couldn't find any close matches for '{user_query}'. Please check your spelling or try a different term."
         return render_template('index.html', error=error_message, query=user_query)
 
     return render_template('index.html', recommendation=None, error=None, query=None)
@@ -285,15 +278,12 @@ def dashboard_page():
         error=error
     )
 
-# --- ### NEW ### Route to serve the Pharmacy Finder page ---
 @app.route('/pharmacy-finder')
 @login_required
 def pharmacy_finder_page():
-    # This just renders the HTML page you moved to templates/
     return render_template('pharmacy_finder.html')
 
 
-# --- ### NEW ### API Endpoint for finding pharmacies (from epics-phase-2) ---
 @app.route('/api/find-pharmacies', methods=['POST'])
 def find_pharmacies():
     try:
@@ -331,15 +321,11 @@ def find_pharmacies():
             print(f"Error processing {pharmacy.get('Name')}: {e}")
             
     if not pharmacies_with_distance:
-        print(f"--- RESULT: No pharmacies found within {SEARCH_RADIUS_KM}km. ---")
         return jsonify([])
 
     sorted_pharmacies = sorted(pharmacies_with_distance, key=lambda p: p['distance_km'])
-    
-    print(f"--- RESULT: Found {len(sorted_pharmacies)} matches, returning sorted list. ---")
     return jsonify(sorted_pharmacies)
 
 
 if __name__ == '__main__':
-  
     app.run(debug=True, port=5000)
