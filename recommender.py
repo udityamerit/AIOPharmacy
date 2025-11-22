@@ -124,6 +124,7 @@ def get_substitutes(medicine_name, df):
     return substitutes.values.flatten().tolist()
 
 # --- UPDATED: Comprehensive Test Block ---
+
 if __name__ == '__main__':
     DATAFRAME_FILE = 'processed_data.pkl'
     
